@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+{{ super() }}
+<p>Нейрон классификация "Выжил-НеВыжил"
+<form action="/p_lab4" method="POST">
+    <p><input name="list1" class="form_text" type="text">Класс каюты</p>
+    <p><input name="list2" class="form_text" type="text"> Пол</p>
+    <p><input name="list2" class="form_text" type="text">Возраст</p>
+    <input type="submit" class="form_btn" value="Узнать результат">
+    <h1>{{class_model}}</h1>
+    </p>
+</form>
+
+{% endblock %}

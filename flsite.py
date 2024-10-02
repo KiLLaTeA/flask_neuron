@@ -1,6 +1,7 @@
 import pickle
 
 import numpy as np
+import pandas as pd
 from flask import Flask, render_template, url_for, request, jsonify
 from model.neuron import SingleNeuron
 
@@ -9,7 +10,8 @@ app = Flask(__name__)
 menu = [{"name": "Лаба 1", "url": "p_knn"},
         {"name": "Лаба 2", "url": "p_lab2"},
         {"name": "Лаба 3", "url": "p_lab3"},
-        {"name": "Лаба 4", "url": "p_lab4"}]
+        {"name": "Лаба 4", "url": "p_lab4"},
+        {"name": "Нейронная сеть", "url": "neural_network"}]
 
 loaded_model_knn = pickle.load(open('model/Iris_pickle_file', 'rb'))
 # Загрузка весов из файла
@@ -54,6 +56,10 @@ def p_lab4():
         print("Предсказанные значения:", predictions, *np.where(predictions >= 0.5, 'Помидор', 'Огурец'))
         return render_template('lab4.html', title="Первый нейрон", menu=menu,
                                class_model="Это: " + str(*np.where(predictions >= 0.5, 'Помидор', 'Огурец')))
+
+@app.route("/neural_network", methods=['POST', 'GET'])
+def neural_network():
+    return render_template('neural_network.html', title="Нейронная сеть", menu=menu)
 
 @app.route('/api', methods=['get'])
 def get_sort():
