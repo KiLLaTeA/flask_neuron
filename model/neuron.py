@@ -1,17 +1,14 @@
 import numpy as np
 
-# Функция активации sigmoid
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
-# Производная sigmoid
 def sigmoid_derivative(x):
-    return x * (1 - x)
+    fx = sigmoid(x)
+    return fx * (1 - fx)
 
-# Нейрон
 class SingleNeuron:
     def __init__(self, input_size):
-        # Инициализация весов случайным образом
         self.weight = np.random.rand(input_size)
         self.bias = np.random.rand(1)
 
@@ -21,29 +18,28 @@ class SingleNeuron:
         self.output = sigmoid(self.z)
         return self.output
 
-    def backward(self, y, learning_rate=0.01):
-        # Вычисляем ошибку
+    def backward(self, y, learning_rate=0.001):
         error = self.output - y
-        # Вычисляем градиенты
+
         d_output = error * sigmoid_derivative(self.output)
         d_weight = np.dot(self.input.T, d_output)
         d_bias = np.sum(d_output)
 
-        # Обновление весов и смещения
         self.weight -= learning_rate * d_weight
         self.bias -= learning_rate * d_bias
 
         return error
 
-    def train(self, X, y, epochs=1000, learning_rate=0.01):
+    def train(self, X, y, epochs=20000, learning_rate=0.001):
         for epoch in range(epochs):
-            self.forward(X)   # Прямое распространение
-            self.backward(y, learning_rate)  # Обратное распространение
+            self.forward(X)
+            self.backward(y, learning_rate)
 
     def save_weights(self, filename):
         np.savetxt(filename, np.hstack((self.weight, self.bias)))
 
     def load_weights(self, filename):
         data = np.loadtxt(filename)
+
         self.weight = data[:-1]
         self.bias = data[-1]

@@ -2,14 +2,14 @@
  
 {% block content %}
 {{ super() }}
-<p>Нейрон - Классификация сорта пшеницы
+<p class="first">Нейрон - Классификация сорта пшеницы</p>
 <form action="/neural_network" method="POST">
-    <p><input name="list1" class="form_text" type="text">perimeter</p>
-    <p><input name="list2" class="form_text" type="text">lengthOfKernel</p>
-    <p><input name="list3" class="form_text" type="text">widthOfKernel</p>
+    <p><input name="list1" class="form_text" type="text"> Perimeter</p>
+    <p><input name="list2" class="form_text" type="text"> Length Of Kernel</p>
+    <p><input name="list3" class="form_text" type="text"> Width Of Kernel</p>
     <input type="submit" class="form_btn" value="Predict">
     <h1>{{class_model}}</h1>
-    </p>
+
 </form>
 
 {% endblock %}

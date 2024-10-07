@@ -14,6 +14,15 @@ a:hover {
 	text-decoration: underline;
 }
 
+h1, .first{
+    display: flex;
+    justify-content: center;
+}
+
+.first{
+    font-size: 24px;
+}
+
 .clear {clear: both;}
 ul.mainmenu {
 	list-styLe: none;
@@ -44,7 +53,7 @@ div.content {
 form {
     margin-left: auto;
     margin-right: auto;
-    max-width: 450px;
+    max-width: 550px;
     background-color: #3F4137;
     color: #fdc073;
     border: 1px solid gray;
@@ -58,4 +67,7 @@ form {
 .form_btn{
   background-color: #f6f6f6; /*Цвет текстового поля*/
   border-radius: 10px 10px 10px 10px; /*Закругляем уголки*/
+  width: 180px;
+  height: 40px;
+  font-size: 20px;
 }
