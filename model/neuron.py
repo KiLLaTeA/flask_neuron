@@ -33,8 +33,10 @@ class SingleNeuron:
         self.weight -= learning_rate * d_weight
         self.bias -= learning_rate * d_bias
 
+        return error
+
     def train(self, X, y, epochs=1000, learning_rate=0.01):
-        for _ in range(epochs):
+        for epoch in range(epochs):
             self.forward(X)   # Прямое распространение
             self.backward(y, learning_rate)  # Обратное распространение
 

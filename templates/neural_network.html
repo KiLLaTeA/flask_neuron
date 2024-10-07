@@ -2,12 +2,12 @@
  
 {% block content %}
 {{ super() }}
-<p>Нейрон классификация "Выжил-НеВыжил"
-<form action="/p_lab4" method="POST">
-    <p><input name="list1" class="form_text" type="text">Класс каюты</p>
-    <p><input name="list2" class="form_text" type="text"> Пол</p>
-    <p><input name="list2" class="form_text" type="text">Возраст</p>
-    <input type="submit" class="form_btn" value="Узнать результат">
+<p>Нейрон - Классификация сорта пшеницы
+<form action="/neural_network" method="POST">
+    <p><input name="list1" class="form_text" type="text">perimeter</p>
+    <p><input name="list2" class="form_text" type="text">lengthOfKernel</p>
+    <p><input name="list3" class="form_text" type="text">widthOfKernel</p>
+    <input type="submit" class="form_btn" value="Predict">
     <h1>{{class_model}}</h1>
     </p>
 </form>

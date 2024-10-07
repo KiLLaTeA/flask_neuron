@@ -1,19 +1,27 @@
 import numpy as np
+import pandas as pd
+
+from sklearn import preprocessing
 from neuron import SingleNeuron
 
+data_fr = pd.read_csv('seeds3.csv')
+data_fr = data_fr.sample(frac=1)
 
-# Пример данных (X - входные данные, y - целевые значения)
-X = np.array([[5, 6],
-              [7, 7],
-              [3, 9],
-              [4, 10],
-              [5, 5],
-              [3, 8],
-              [5, 10]])
-y = np.array([1, 1, 0, 0, 1, 0, 0])  # Ожидаемый выход
+dsx = data_fr[['perimeter', 'lengthOfKernel', 'widthOfKernel']]
+dsy = data_fr[['seedType']]
+data_x = np.array(dsx)
+
+scaler = preprocessing.MinMaxScaler()
+dsy = scaler.fit_transform(dsy)
+data_y = dsy.reshape(1, -1)[0]
+
+# print(data_x)
+# print(data_y)
+#
+#
 # Инициализация и обучение нейрона
-neuron = SingleNeuron(input_size=2)
-neuron.train(X, y, epochs=5000, learning_rate=0.1)
+neuron = SingleNeuron(input_size=3) # было 2
+neuron.train(data_x, data_y, epochs=600, learning_rate=0.04)
 
 # Сохранение весов в файл
 neuron.save_weights('neuron_weights.txt')
