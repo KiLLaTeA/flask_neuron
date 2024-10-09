@@ -21,7 +21,9 @@ model_class = tf.keras.Sequential([
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
-model_class.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.001))
+model_class.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.001))
+# binary_crossentropy
+# mean_squared_error
 
 model_class.fit(data_x, data_y, epochs=1000, batch_size=32)
 

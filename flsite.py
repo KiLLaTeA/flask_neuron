@@ -64,7 +64,7 @@ def predict_classification():
 
     predictions = model_class.predict(input_data)
     print(predictions)
-    result = "Первый сорт" if predictions[0][0] <= 0.5 else "Второй сорт"
+    result = "First sort" if predictions[0][0] <= 0.5 else "Second sort"
     print(result)
 
     app.config['JSON_AS_ASCII'] = False
