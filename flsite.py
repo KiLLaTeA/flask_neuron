@@ -10,8 +10,8 @@ app = Flask(__name__)
 
 menu = [
             {"name": "(Lab_14) Нейронная сеть", "url": "neural_network"},
-            {"name": "(Lab_16) API классификации", "url": "api_class"},
-            {"name": "(Lab_16) API регрессии", "url": "api_reg"}
+            {"name": "(Lab_16) API классификации", "url": "api_class?Perimeter=16.72&LengthOfKernel=6.303&WidthOfKernel=3.791"},
+            {"name": "(Lab_16) API регрессии", "url": "api_reg?LengthOfKernel=6.303"}
        ]
 
 new_neuron = SingleNeuron(input_size=3)
