@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+{{ super() }}
+<p class="first">Классификация одежды</p>
+<!--<form action="/neural_network" method="POST">-->
+<!--    <p><input name="list1" class="form_text" type="text"> Perimeter</p>-->
+<!--    <p><input name="list2" class="form_text" type="text"> Length Of Kernel</p>-->
+<!--    <p><input name="list3" class="form_text" type="text"> Width Of Kernel</p>-->
+<!--    <input type="submit" class="form_btn" value="Predict">-->
+<!--    <h1>{{class_model}}</h1>-->
+
+<!--</form>-->
+
+<form action="/mnist_fashion" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*">
+    <button type="submit">Загрузить ваше изображение</button>
+    <h1>{{fashion_model}}</h1>
+</form>
+
+{% endblock %}

@@ -1,23 +1,41 @@
 import pickle
 import pandas as pd
+import os
+import PIL
 
 import numpy as np
 import tensorflow as tf
-from flask import Flask, render_template, url_for, request, jsonify
+from flask import Flask, render_template, url_for, request, jsonify, redirect
 from model.neuron import SingleNeuron
+
+from keras.src.legacy.preprocessing import image
 
 app = Flask(__name__)
 
 menu = [
             {"name": "(Lab_14) Нейронная сеть", "url": "neural_network"},
             {"name": "(Lab_16) API классификации", "url": "api_class?Perimeter=16.72&LengthOfKernel=6.303&WidthOfKernel=3.791"},
-            {"name": "(Lab_16) API регрессии", "url": "api_reg?LengthOfKernel=6.303"}
+            {"name": "(Lab_16) API регрессии", "url": "api_reg?LengthOfKernel=6.303"},
+            {"name": "(Lab_17) Одежда", "url": "mnist_fashion"}
        ]
+
+fashion_classes = {
+    0: "T-shirt/top", 1: "Trouser", 2: "Pullover", 3: "Dress",
+    4: "Coat", 5: "Sandal", 6: "Shirt", 7: "Sneaker",
+    8: "Bag", 9: "Ankle boot"
+}
+
+UPLOAD_FOLDER = 'model/clothes'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 new_neuron = SingleNeuron(input_size=3)
 new_neuron.load_weights('model/neuron_weights.txt')
 model_reg = tf.keras.models.load_model('model/regression_model.h5')
 model_class = tf.keras.models.load_model('model/classification_model.h5')
+model_fashion = tf.keras.models.load_model('model/fashion.h5')
 
 @app.route("/")
 def index():
@@ -69,6 +87,40 @@ def predict_classification():
 
     app.config['JSON_AS_ASCII'] = False
     return jsonify(ov = str(result))
+
+
+@app.route("/mnist_fashion", methods=['POST', 'GET'])
+def upload_clothes():
+    if request.method == 'GET':
+        return render_template('fashion.html', title="Классификация одежды", menu=menu, fashion_model='')
+    if request.method == 'POST':
+        if 'image' not in request.files:
+            return "Нету пути файла"
+
+        file = request.files['image']
+
+        if file.filename == '':
+            return "Не выбран файл"
+
+        if file:
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+
+            img_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+
+            img = image.image_utils.load_img(img_path, target_size=(28, 28), color_mode="grayscale")
+            x = image.image_utils.img_to_array(img)
+            x = x.reshape(1, 784)
+            x = 255 - x
+            x /= 255
+
+            predictions = model_fashion.predict(x)
+            predictions = np.argmax(predictions)
+            print("Номер класса:", predictions)
+
+            return render_template('fashion.html', title="Классификация одежды", menu=menu,
+                                   fashion_model="Результат: " + str(predictions) + "\n"
+                                                 + "Это " + fashion_classes[predictions])
+
 
 
 if __name__ == "__main__":
