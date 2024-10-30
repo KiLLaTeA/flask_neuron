@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+{{ super() }}
+<p class="first">Классификация одежды 2</p>
+
+<form action="/mnist_CNN" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*">
+    <button type="submit">Загрузить ваше изображение</button>
+    <h1>{{CNN_model}}</h1>
+</form>
+
+{% endblock %}

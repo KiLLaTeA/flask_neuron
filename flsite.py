@@ -16,7 +16,8 @@ menu = [
             {"name": "(Lab_14) Нейронная сеть", "url": "neural_network"},
             {"name": "(Lab_16) API классификации", "url": "api_class?Perimeter=16.72&LengthOfKernel=6.303&WidthOfKernel=3.791"},
             {"name": "(Lab_16) API регрессии", "url": "api_reg?LengthOfKernel=6.303"},
-            {"name": "(Lab_17) Одежда", "url": "mnist_fashion"}
+            {"name": "(Lab_17) Одежда", "url": "mnist_fashion"},
+            {"name": "(Lab_18) Одежда", "url": "mnist_CNN"}
        ]
 
 fashion_classes = {
@@ -36,6 +37,7 @@ new_neuron.load_weights('model/neuron_weights.txt')
 model_reg = tf.keras.models.load_model('model/regression_model.h5')
 model_class = tf.keras.models.load_model('model/classification_model.h5')
 model_fashion = tf.keras.models.load_model('model/fashion.h5')
+model_fashion_CNN = tf.keras.models.load_model('model/fashion_CNN.h5')
 
 @app.route("/")
 def index():
@@ -121,6 +123,41 @@ def upload_clothes():
                                    fashion_model="Результат: " + str(predictions) + "\n"
                                                  + "Это " + fashion_classes[predictions])
 
+
+@app.route("/mnist_CNN", methods=['POST', 'GET'])
+def upload_CNN():
+    if request.method == 'GET':
+        return render_template('fashion_CNN.html', title="Классификация одежды 2", menu=menu, CNN_model='')
+    if request.method == 'POST':
+        if 'image' not in request.files:
+            return "Нету пути файла"
+
+        file = request.files['image']
+
+        if file.filename == '':
+            return "Не выбран файл"
+
+        if file:
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+
+            img_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+
+            img = image.image_utils.load_img(img_path, target_size=(28, 28), color_mode="grayscale")
+            x = image.image_utils.img_to_array(img)
+            np.shape(x)
+            # x = x.reshape(1, 784)
+            x = 255 - x
+            x = np.expand_dims(x, axis=0)
+            np.shape(x)
+            # x /= 255
+
+            predictions = model_fashion_CNN.predict(x)
+            predictions = np.argmax(predictions)
+            print("Номер класса:", predictions)
+
+            return render_template('fashion_CNN.html', title="Классификация одежды 2", menu=menu,
+                                   CNN_model="Результат: " + str(predictions) + "\n"
+                                                 + "Это " + fashion_classes[predictions])
 
 
 if __name__ == "__main__":
