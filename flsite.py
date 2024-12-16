@@ -1,24 +1,22 @@
-import pickle
-import pandas as pd
 import os
-import PIL
 
 import numpy as np
 import tensorflow as tf
-from flask import Flask, render_template, url_for, request, jsonify, redirect
-from model.neuron import SingleNeuron
+from flask import Flask, render_template, request, jsonify
+from model.Lab14.neuron import SingleNeuron
 
 from keras.src.legacy.preprocessing import image
 
 app = Flask(__name__)
 
 menu = [
-            {"name": "(Lab_14) Нейронная сеть", "url": "neural_network"},
-            {"name": "(Lab_16) API классификации", "url": "api_class?Perimeter=16.72&LengthOfKernel=6.303&WidthOfKernel=3.791"},
-            {"name": "(Lab_16) API регрессии", "url": "api_reg?LengthOfKernel=6.303"},
-            {"name": "(Lab_17) Одежда", "url": "mnist_fashion"},
-            {"name": "(Lab_18) Одежда", "url": "mnist_CNN"}
-       ]
+    {"name": "(Lab_14) Нейронная сеть", "url": "neural_network"},
+    {"name": "(Lab_16) API классификации", "url": "api_class?Perimeter=16.72&LengthOfKernel=6.303&WidthOfKernel=3.791"},
+    {"name": "(Lab_16) API регрессии", "url": "api_reg?LengthOfKernel=6.303"},
+    {"name": "(Lab_17) Одежда", "url": "mnist_fashion"},
+    {"name": "(Lab_18) Одежда", "url": "mnist_CNN"},
+    {"name": "(Lab_21) Детектирование", "url": "Lab_21"}
+]
 
 fashion_classes = {
     0: "T-shirt/top", 1: "Trouser", 2: "Pullover", 3: "Dress",
@@ -34,10 +32,10 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 new_neuron = SingleNeuron(input_size=3)
 new_neuron.load_weights('model/neuron_weights.txt')
-model_reg = tf.keras.models.load_model('model/regression_model.h5')
-model_class = tf.keras.models.load_model('model/classification_model.h5')
-model_fashion = tf.keras.models.load_model('model/fashion.h5')
-model_fashion_CNN = tf.keras.models.load_model('model/fashion_CNN.h5')
+model_reg = tf.keras.models.load_model('model/Lab16/regression_model.h5')
+model_class = tf.keras.models.load_model('model/Lab16/classification_model.h5')
+model_fashion = tf.keras.models.load_model('model/Lab17/fashion.h5')
+model_fashion_CNN = tf.keras.models.load_model('model/Lab18/fashion_CNN.h5')
 
 @app.route("/")
 def index():
@@ -158,6 +156,11 @@ def upload_CNN():
             return render_template('fashion_CNN.html', title="Классификация одежды 2", menu=menu,
                                    CNN_model="Результат: " + str(predictions) + "\n"
                                                  + "Это " + fashion_classes[predictions])
+
+
+@app.route("/Lab_21", methods=['POST', 'GET'])
+def upload_21():
+    pass
 
 
 if __name__ == "__main__":

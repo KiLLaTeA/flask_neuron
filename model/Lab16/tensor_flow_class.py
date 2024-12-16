@@ -4,7 +4,7 @@ import numpy as np
 
 from sklearn import preprocessing
 
-data_fr = pd.read_csv('seeds_Classification.csv')
+data_fr = pd.read_csv('../seeds_Classification.csv')
 data_fr = data_fr.sample(frac=1)
 
 dsx = data_fr[['perimeter', 'lengthOfKernel', 'widthOfKernel']]

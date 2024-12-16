@@ -19,6 +19,13 @@ h1, .first{
     justify-content: center;
 }
 
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 .first{
     font-size: 24px;
 }
@@ -49,6 +56,9 @@ ul.mainmenu li a:hover {
 
 div.content {
 	margin: 10px;
+	width: 600px;
+	display: flex;
+	justify-content: center;
 }
 form {
     margin-left: auto;

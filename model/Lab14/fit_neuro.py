@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn import preprocessing
 from neuron import SingleNeuron
 
-data_fr = pd.read_csv('seeds_Classification.csv')
+data_fr = pd.read_csv('../seeds_Classification.csv')
 data_fr = data_fr.sample(frac=1)
 
 dsx = data_fr[['perimeter', 'lengthOfKernel', 'widthOfKernel']]

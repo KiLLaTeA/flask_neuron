@@ -3,4 +3,11 @@
 {% block content %}
 {{ super() }}
 <p class="first">Содержимое главной страницы</p>
+<div class="content">
+    <ul class="list-group ">
+        {% for m in menu -%}
+        <li class="list-group-item"><a href="{{m.url}}">{{m.name}}</a></li>
+        {% endfor -%}
+    </ul>
+</div>
 {% endblock %}
