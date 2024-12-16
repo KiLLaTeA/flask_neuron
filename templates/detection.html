@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+{{ super() }}
+<p class="first">Детектирование объхектов</p>
+
+<form action="/Lab_21" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*">
+    <button type="submit">Загрузить ваше изображение</button>
+</form>
+
+{% for p in detected_images -%}
+    <img src="{{ p }}" alt="">
+    <br>
+{% endfor -%}
+
+{% endblock %}
