@@ -1,0 +1,3 @@
+# игнорируем изображения для обучения - их много
+# Датасет - The Oxford-IIIT Pet Dataset
+model/Lab19/cats_dogs/*

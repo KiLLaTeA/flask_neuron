@@ -5,12 +5,15 @@ import cv2
 
 from PIL import Image
 
+from googletrans import Translator
+
 import numpy as np
 import tensorflow as tf
 from flask import Flask, render_template, request, jsonify
 from model.Lab14.neuron import SingleNeuron
 
 from keras.src.legacy.preprocessing import image
+from keras import utils
 
 app = Flask(__name__)
 
@@ -20,6 +23,7 @@ menu = [
     {"name": "(Lab_16) API регрессии", "url": "api_reg?LengthOfKernel=6.303"},
     {"name": "(Lab_17) Одежда", "url": "mnist_fashion"},
     {"name": "(Lab_18) Одежда", "url": "mnist_CNN"},
+    {"name": "(Lab_19) Аугментация", "url": "Lab_19"},
     {"name": "(Lab_21) Детектирование", "url": "Lab_21"}
 ]
 
@@ -30,9 +34,11 @@ fashion_classes = {
 }
 
 UPLOAD_FOLDER = 'model/clothes'
+LAB19_FOLDER = 'model/Lab19'
 DETECT_FOLDER = './static/images/Lab21/detect'
 ORIGINAL_FOLDER = './static/images/Lab21/original_images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['LAB19_FOLDER'] = LAB19_FOLDER
 app.config['DETECT_FOLDER'] = DETECT_FOLDER
 app.config['ORIGINAL_FOLDER'] = ORIGINAL_FOLDER
 
@@ -51,8 +57,8 @@ model_reg = tf.keras.models.load_model('model/Lab16/regression_model.h5')
 model_class = tf.keras.models.load_model('model/Lab16/classification_model.h5')
 model_fashion = tf.keras.models.load_model('model/Lab17/fashion.h5')
 model_fashion_CNN = tf.keras.models.load_model('model/Lab18/fashion_CNN.h5')
+model_CATSDOGS = tf.keras.models.load_model('model/Lab19/cats_dogs_augment.h5')
 model_YOLO = torch.hub.load(repo_or_dir='./model/Lab21/yolov5', model='yolov5s', source = 'local')
-# model_YOLO = torch.hub.load('ultralytics/yolov5', 'yolov5s')
 
 
 @app.route("/")
@@ -174,6 +180,48 @@ def upload_CNN():
             return render_template('fashion_CNN.html', title="Классификация одежды 2", menu=menu,
                                    CNN_model="Результат: " + str(predictions) + "\n"
                                                  + "Это " + fashion_classes[predictions])
+
+
+@app.route("/Lab_19", methods=['POST', 'GET'])
+def animals():
+    if request.method == 'GET':
+        return render_template('animals.html', title="Классификация с аугментацией", menu=menu, animal_model='')
+    if request.method == 'POST':
+        if 'image' not in request.files:
+            return "Нету пути файла"
+
+        file = request.files['image']
+
+        if file.filename == '':
+            return "Не выбран файл"
+
+        if file:
+            translator = Translator()
+
+            img_height = 180
+            img_width = 180
+            class_names = ['cats', 'dogs']
+
+            file.save(os.path.join(app.config['LAB19_FOLDER'], file.filename))
+            img_path = os.path.join(app.config['LAB19_FOLDER'], file.filename)
+
+            img = utils.load_img(
+                img_path, target_size=(img_height, img_width)
+            )
+
+            img_array = utils.img_to_array(img)
+            img_array = tf.expand_dims(img_array, 0)
+
+            predictions = model_CATSDOGS.predict(img_array)
+            print(predictions)
+            score = tf.nn.softmax(predictions[0])
+
+            class_detect = class_names[np.argmax(score)]
+
+            translated = translator.translate(class_detect[0:3], src='en', dest='ru')
+
+            return render_template('animals.html', title="Классификация с аугментацией", menu=menu,
+                animal_model=f"Похоже на этом фото есть {translated.text} с вероятностью {100 * np.max(score)} процентов.")
 
 
 @app.route("/Lab_21", methods=['POST', 'GET'])
