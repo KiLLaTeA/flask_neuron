@@ -4,6 +4,7 @@ import torch
 import cv2
 
 from PIL import Image
+from click.testing import Result
 
 from googletrans import Translator
 
@@ -12,10 +13,8 @@ import tensorflow as tf
 from flask import Flask, render_template, request, jsonify
 from model.Lab14.neuron import SingleNeuron
 
-import keras
-
 from keras.src.legacy.preprocessing import image
-from keras import utils, models
+from keras import utils
 
 app = Flask(__name__)
 
@@ -27,7 +26,8 @@ menu = [
     {"name": "(Lab_18) Одежда", "url": "mnist_CNN"},
     {"name": "(Lab_19) Аугментация", "url": "Lab_19"},
     {"name": "(Lab_20) Дообучение", "url": "Lab_20"},
-    {"name": "(Lab_21) Детектирование", "url": "Lab_21"}
+    {"name": "(Lab_21) Детектирование", "url": "Lab_21"},
+    {"name": "(Lab_22) Дообучение YOLO", "url": "Lab_22"}
 ]
 
 fashion_classes = {
@@ -39,12 +39,16 @@ fashion_classes = {
 UPLOAD_FOLDER = 'model/clothes'
 LAB19_FOLDER = 'model/Lab19'
 LAB20_FOLDER = 'model/Lab20'
+LAB22_FOLDER = 'model/Lab22'
 DETECT_FOLDER = './static/images/Lab21/detect'
 ORIGINAL_FOLDER = './static/images/Lab21/original_images'
+DETECT_FOLDER_22 = './static/images/Lab22/detect'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['LAB19_FOLDER'] = LAB19_FOLDER
+app.config['LAB22_FOLDER'] = LAB22_FOLDER
 app.config['LAB20_FOLDER'] = LAB20_FOLDER
 app.config['DETECT_FOLDER'] = DETECT_FOLDER
+app.config['DETECT_FOLDER_22'] = DETECT_FOLDER_22
 app.config['ORIGINAL_FOLDER'] = ORIGINAL_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
@@ -65,6 +69,8 @@ model_fashion_CNN = tf.keras.models.load_model('model/Lab18/fashion_CNN.h5')
 model_CATSDOGS = tf.keras.models.load_model('model/Lab19/cats_dogs_augment.h5')
 model_trans = tf.keras.models.load_model('./model/Lab20/trans_learn.keras')
 model_YOLO = torch.hub.load(repo_or_dir='./model/Lab21/yolov5', model='yolov5s', source = 'local')
+model_yolo_plus = torch.hub.load(repo_or_dir='./model/Lab22/yolov5', model='custom',
+                                 path='./model/Lab22/yolov5/runs/train/catsdogs_yolov5s_results/weights/best.pt', source = 'local', force_reload=True)
 
 @app.route("/")
 def index():
@@ -341,6 +347,36 @@ def upload_21():
             print(paths)
 
             return render_template('detection.html', title="Детектирование объектов", menu=menu,
+                                   detected_images=paths)
+
+
+@app.route("/Lab_22", methods=['POST', 'GET'])
+def trans_YOLO():
+    if request.method == 'GET':
+        return render_template('yolo.html', title="YOLO с дообучением", menu=menu, detected_images='')
+    if request.method == 'POST':
+        if 'image' not in request.files:
+            return "Нету пути файла"
+
+        file = request.files['image']
+
+        if file.filename == '':
+            return "Не выбран файл"
+
+        if file:
+            img_path = os.path.join(app.config['LAB22_FOLDER'], file.filename)
+            file.save(img_path)
+            res = model_yolo_plus(img_path)
+            res.save(labels=True, save_dir=os.path.join('./', app.config['DETECT_FOLDER_22']), exist_ok=True)
+
+            paths = [
+                "/static/images/Lab22/detect/" + file.filename,
+            ]
+
+        #DETECT_FOLDER_22
+
+
+            return render_template('yolo.html', title="YOLO с дообучением", menu=menu,
                                    detected_images=paths)
 
 
