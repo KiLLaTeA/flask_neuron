@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+{{ super() }}
+<p class="first">Классификация c дообучением</p>
+
+<form action="/Lab_20" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*">
+    <button type="submit">Загрузить ваше изображение</button>
+    <h1>{{trans_model}}</h1>
+</form>
+<img src="/static/images/Lab20/plt_data.png" alt="plt_data.jpg">
+<img src="/static/images/Lab20/plt_rotate.png" alt="plt_rotate.png">
+<img src="/static/images/Lab20/plt_accuracy.jpg" alt="plt_accuracy.jpg">
+
+{% endblock %}

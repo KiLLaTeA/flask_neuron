@@ -12,8 +12,10 @@ import tensorflow as tf
 from flask import Flask, render_template, request, jsonify
 from model.Lab14.neuron import SingleNeuron
 
+import keras
+
 from keras.src.legacy.preprocessing import image
-from keras import utils
+from keras import utils, models
 
 app = Flask(__name__)
 
@@ -24,6 +26,7 @@ menu = [
     {"name": "(Lab_17) Одежда", "url": "mnist_fashion"},
     {"name": "(Lab_18) Одежда", "url": "mnist_CNN"},
     {"name": "(Lab_19) Аугментация", "url": "Lab_19"},
+    {"name": "(Lab_20) Дообучение", "url": "Lab_20"},
     {"name": "(Lab_21) Детектирование", "url": "Lab_21"}
 ]
 
@@ -35,10 +38,12 @@ fashion_classes = {
 
 UPLOAD_FOLDER = 'model/clothes'
 LAB19_FOLDER = 'model/Lab19'
+LAB20_FOLDER = 'model/Lab20'
 DETECT_FOLDER = './static/images/Lab21/detect'
 ORIGINAL_FOLDER = './static/images/Lab21/original_images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['LAB19_FOLDER'] = LAB19_FOLDER
+app.config['LAB20_FOLDER'] = LAB20_FOLDER
 app.config['DETECT_FOLDER'] = DETECT_FOLDER
 app.config['ORIGINAL_FOLDER'] = ORIGINAL_FOLDER
 
@@ -58,8 +63,8 @@ model_class = tf.keras.models.load_model('model/Lab16/classification_model.h5')
 model_fashion = tf.keras.models.load_model('model/Lab17/fashion.h5')
 model_fashion_CNN = tf.keras.models.load_model('model/Lab18/fashion_CNN.h5')
 model_CATSDOGS = tf.keras.models.load_model('model/Lab19/cats_dogs_augment.h5')
+model_trans = tf.keras.models.load_model('./model/Lab20/trans_learn.keras')
 model_YOLO = torch.hub.load(repo_or_dir='./model/Lab21/yolov5', model='yolov5s', source = 'local')
-
 
 @app.route("/")
 def index():
@@ -222,6 +227,45 @@ def animals():
 
             return render_template('animals.html', title="Классификация с аугментацией", menu=menu,
                 animal_model=f"Похоже на этом фото есть {translated.text} с вероятностью {100 * np.max(score)} процентов.")
+
+
+@app.route("/Lab_20", methods=['POST', 'GET'])
+def trans_learning():
+    if request.method == 'GET':
+        return render_template('trans.html', title="Классификация c дообучением", menu=menu, trans_model='')
+    if request.method == 'POST':
+        if 'image' not in request.files:
+            return "Нету пути файла"
+
+        file = request.files['image']
+
+        if file.filename == '':
+            return "Не выбран файл"
+
+        if file:
+            translator = Translator()
+
+            class_names = ['cats', 'dogs']
+
+            file.save(os.path.join(app.config['LAB20_FOLDER'], file.filename))
+            img_path = os.path.join(app.config['LAB20_FOLDER'], file.filename)
+
+            img = utils.load_img(
+                img_path, target_size=(160, 160)
+            )
+            img_array = utils.img_to_array(img)
+            img_array = tf.expand_dims(img_array, 0)
+
+            predictions = model_trans.predict_on_batch(img_array)
+            predictions = model_trans.predict_on_batch(img_array).flatten()
+            predictions = tf.nn.sigmoid(predictions)
+            predictions = tf.where(predictions < 0.5, 0, 1)
+
+            class_detect = class_names[int(predictions)]
+            translated = translator.translate(class_detect[0:3], src='en', dest='ru')
+
+            return render_template('trans.html', title="Классификация c дообучением", menu=menu,
+                trans_model=f"На этом изображении -  {translated.text}")
 
 
 @app.route("/Lab_21", methods=['POST', 'GET'])
